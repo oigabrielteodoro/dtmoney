@@ -4,8 +4,6 @@ import Modal from "react-modal";
 
 import { TransactionsContext } from "../../TransactionsContext";
 
-import { api } from "../../services/api";
-
 import incomeImg from '../../assets/income.svg';
 import outcomeImg from '../../assets/outcome.svg';
 
