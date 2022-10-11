@@ -1,7 +1,18 @@
+import logoImg from "src/assets/logo.svg";
+
+import {
+  HeaderContainer,
+  HeaderContent,
+  NewTransactionButton,
+} from "./Header.styles";
+
 export function Header() {
   return (
-    <header>
-      <h1>Header</h1>
-    </header>
+    <HeaderContainer>
+      <HeaderContent>
+        <img src={logoImg} />
+        <NewTransactionButton>Nova transação</NewTransactionButton>
+      </HeaderContent>
+    </HeaderContainer>
   );
 }
