@@ -11,6 +11,7 @@ import {
   TransactionType,
   TransactionTypeButton,
 } from "./NewTransactionModal.styles";
+import { useTransactionsContext } from "src/contexts/TransactionsContext";
 
 const newTransactionFormSchema = z.object({
   description: z.string(),
@@ -19,22 +20,25 @@ const newTransactionFormSchema = z.object({
   type: z.enum(["income", "outcome"]),
 });
 
-type NewTransactionFormParams = z.infer<typeof newTransactionFormSchema>;
+export type NewTransactionFormParams = z.infer<typeof newTransactionFormSchema>;
 
 export function NewTransactionModal() {
+  const { createNewTransaction } = useTransactionsContext();
+
   const {
     control,
     register,
     handleSubmit,
+    reset,
     formState: { isSubmitting },
   } = useForm<NewTransactionFormParams>({
     resolver: zodResolver(newTransactionFormSchema),
   });
 
   async function handleCreateNewTransaction(data: NewTransactionFormParams) {
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await createNewTransaction(data);
 
-    console.log(data);
+    reset();
   }
 
   return (

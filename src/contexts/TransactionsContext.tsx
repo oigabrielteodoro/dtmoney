@@ -5,6 +5,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import { NewTransactionFormParams } from "src/components/NewTransactionModal";
 import { api } from "src/lib/axios";
 
 type TransactionType = "income" | "outcome";
@@ -25,6 +26,7 @@ type TransactionsProviderProps = {
 type TransactionsContextProps = {
   transactions: Transaction[];
   fetchTransactions: (query?: string) => Promise<void>;
+  createNewTransaction: (data: NewTransactionFormParams) => Promise<void>;
 };
 
 const TransactionsContext = createContext({} as TransactionsContextProps);
@@ -35,6 +37,7 @@ export function TransactionsProvider({ children }: TransactionsProviderProps) {
   async function fetchTransactions(query?: string) {
     const response = await api.get("transactions", {
       params: {
+        _sort: "createdAt",
         q: query,
       },
     });
@@ -42,12 +45,31 @@ export function TransactionsProvider({ children }: TransactionsProviderProps) {
     setTransactions(response.data);
   }
 
+  async function createNewTransaction({
+    category,
+    description,
+    price,
+    type,
+  }: NewTransactionFormParams) {
+    const response = await api.post("transactions", {
+      description,
+      price,
+      category,
+      type,
+      createdAt: new Date(),
+    });
+
+    setTransactions((state) => [response.data, ...state]);
+  }
+
   useEffect(() => {
     fetchTransactions();
   }, []);
 
   return (
-    <TransactionsContext.Provider value={{ transactions, fetchTransactions }}>
+    <TransactionsContext.Provider
+      value={{ transactions, fetchTransactions, createNewTransaction }}
+    >
       {children}
     </TransactionsContext.Provider>
   );
