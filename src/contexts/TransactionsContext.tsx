@@ -1,10 +1,6 @@
-import {
-  createContext,
-  ReactNode,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { ReactNode, useCallback, useEffect, useState } from "react";
+import { createContext } from "use-context-selector";
+
 import { NewTransactionFormParams } from "src/components/NewTransactionModal";
 import { api } from "src/lib/axios";
 
@@ -29,7 +25,9 @@ type TransactionsContextProps = {
   createNewTransaction: (data: NewTransactionFormParams) => Promise<void>;
 };
 
-const TransactionsContext = createContext({} as TransactionsContextProps);
+export const TransactionsContext = createContext(
+  {} as TransactionsContextProps
+);
 
 export function TransactionsProvider({ children }: TransactionsProviderProps) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -45,22 +43,25 @@ export function TransactionsProvider({ children }: TransactionsProviderProps) {
     setTransactions(response.data);
   }
 
-  async function createNewTransaction({
-    category,
-    description,
-    price,
-    type,
-  }: NewTransactionFormParams) {
-    const response = await api.post("transactions", {
+  const createNewTransaction = useCallback(
+    async ({
+      category,
       description,
       price,
-      category,
       type,
-      createdAt: new Date(),
-    });
+    }: NewTransactionFormParams) => {
+      const response = await api.post("transactions", {
+        description,
+        price,
+        category,
+        type,
+        createdAt: new Date(),
+      });
 
-    setTransactions((state) => [response.data, ...state]);
-  }
+      setTransactions((state) => [response.data, ...state]);
+    },
+    []
+  );
 
   useEffect(() => {
     fetchTransactions();
@@ -73,8 +74,4 @@ export function TransactionsProvider({ children }: TransactionsProviderProps) {
       {children}
     </TransactionsContext.Provider>
   );
-}
-
-export function useTransactionsContext() {
-  return useContext(TransactionsContext);
 }
